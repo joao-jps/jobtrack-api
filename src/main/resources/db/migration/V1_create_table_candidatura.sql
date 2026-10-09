@@ -7,7 +7,7 @@ modalidade       VARCHAR(20),
 origem           VARCHAR(50),
 data_candidatura DATE         NOT NULL,
 status           VARCHAR(20)  NOT NULL,
-observacoes      TEXT
+observacoes      TEXT,
 criado_em        TIMESTAMP    NOT NULL,
 atualizado_em    TIMESTAMP    NOT NULL,
 
