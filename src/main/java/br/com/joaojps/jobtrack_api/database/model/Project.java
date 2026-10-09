@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "projeto")
+// Guarda os dados do projeto; atualiza as datas quando ele é criado ou editado.
 public class Project {
 
     @Id
@@ -38,9 +39,11 @@ public class Project {
     private LocalDateTime updatedAt;
 
     protected Project() {
+        // O JPA usa este construtor para carregar o projeto do banco.
     }
 
     public Project(String nome, String objetivo, ProjectStatus status) {
+        // Cria o projeto; as datas são preenchidas quando ele for salvo.
         this.name = nome;
         this.objective = objetivo;
         this.status = status;
@@ -48,6 +51,7 @@ public class Project {
 
     @PrePersist
     void preencherDatasDeCriacao() {
+        // Preenche as datas quando o projeto é salvo pela primeira vez.
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
@@ -55,23 +59,27 @@ public class Project {
 
     @PreUpdate
     void atualizarDataDeAtualizacao() {
+        // Atualiza a data quando o projeto é editado.
         updatedAt = LocalDateTime.now();
     }
 
-    public Long getIdentificador() { return id; }
-    public String getNome() { return name; }
-    public String getObjetivo() { return objective; }
-    public ProjectStatus getStatus() { return status; }
-    public LocalDateTime getDataCriacao() { return createdAt; }
-    public LocalDateTime getDataAtualizacao() { return updatedAt; }
+    // Estes getters usam nomes em português no resto da aplicação.
+    public Long getIdentificador() { return id; } // Retorna o ID do projeto.
+    public String getNome() { return name; } // Retorna o nome do projeto.
+    public String getObjetivo() { return objective; } // Retorna o objetivo do projeto.
+    public ProjectStatus getStatus() { return status; } // Retorna o status atual.
+    public LocalDateTime getDataCriacao() { return createdAt; } // Retorna quando foi criado.
+    public LocalDateTime getDataAtualizacao() { return updatedAt; } // Retorna quando foi editado.
 
     public void atualizarDados(String nome, String objetivo, ProjectStatus status) {
+        // Atualiza os dados sem mexer no ID nem nas datas.
         this.name = nome;
         this.objective = objetivo;
         this.status = status;
     }
 
     public void atualizarStatus(ProjectStatus status) {
+        // Muda o status e mantém os outros dados como estão.
         this.status = status;
     }
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "projeto_materia")
+// Guarda uma matéria e o ID do projeto ao qual ela pertence.
 public class ProjectSubject {
 
     @Id
@@ -25,20 +26,24 @@ public class ProjectSubject {
     private String description;
 
     protected ProjectSubject() {
+        // O JPA usa este construtor para carregar a matéria do banco.
     }
 
     public ProjectSubject(Long identificadorProjeto, String nome, String descricao) {
+        // Cria a matéria já ligada ao projeto da rota.
         this.projectId = identificadorProjeto;
         this.name = nome;
         this.description = descricao;
     }
 
-    public Long getIdentificador() { return id; }
-    public Long getIdentificadorProjeto() { return projectId; }
-    public String getNome() { return name; }
-    public String getDescricao() { return description; }
+    // Estes getters entregam os dados usados nas respostas da API.
+    public Long getIdentificador() { return id; } // Retorna o ID da matéria.
+    public Long getIdentificadorProjeto() { return projectId; } // Retorna o ID do projeto.
+    public String getNome() { return name; } // Retorna o nome da matéria.
+    public String getDescricao() { return description; } // Retorna a descrição, se foi informada.
 
     public void atualizarDados(String nome, String descricao) {
+        // Muda os dados da matéria sem trocar o projeto.
         this.name = nome;
         this.description = descricao;
     }

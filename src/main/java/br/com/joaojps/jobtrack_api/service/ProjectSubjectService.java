@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
+// Confere o projeto, cuida das matérias e prepara as respostas da API.
 public class ProjectSubjectService {
 
     private final ProjectRepository repositorioDeProjetos;
@@ -21,12 +22,14 @@ public class ProjectSubjectService {
 
     public ProjectSubjectService(ProjectRepository repositorioDeProjetos,
                                  ProjectSubjectRepository repositorioDeMaterias) {
+        // Guarda os repositórios usados para buscar projetos e salvar matérias.
         this.repositorioDeProjetos = repositorioDeProjetos;
         this.repositorioDeMaterias = repositorioDeMaterias;
     }
 
     @Transactional(readOnly = true)
     public Optional<List<SubjectResponse>> listarMateriasDoProjeto(Long identificadorProjeto) {
+        // Confere se o projeto existe antes de listar as matérias.
         if (!repositorioDeProjetos.existsById(identificadorProjeto)) {
             return Optional.empty();
         }
@@ -35,6 +38,7 @@ public class ProjectSubjectService {
     }
 
     public Optional<SubjectResponse> adicionarMateriaAoProjeto(Long identificadorProjeto, SubjectRequest dadosDaMateria) {
+        // Só salva a matéria se o projeto existir.
         if (!repositorioDeProjetos.existsById(identificadorProjeto)) {
             return Optional.empty();
         }
@@ -46,6 +50,7 @@ public class ProjectSubjectService {
     public Optional<SubjectResponse> atualizarMateriaDoProjeto(Long identificadorProjeto,
                                                                Long identificadorMateria,
                                                                SubjectRequest dadosDaMateria) {
+        // Confere se a matéria é desse projeto antes de atualizar.
         return repositorioDeMaterias.buscarPorIdentificadorEProjeto(identificadorMateria, identificadorProjeto)
                 .map(materiaEncontrada -> {
             materiaEncontrada.atualizarDados(dadosDaMateria.nome(), dadosDaMateria.descricao());
@@ -54,6 +59,7 @@ public class ProjectSubjectService {
     }
 
     public boolean removerMateriaDoProjeto(Long identificadorProjeto, Long identificadorMateria) {
+        // Só remove a matéria se ela for desse projeto.
         Optional<ProjectSubject> materiaEncontrada = repositorioDeMaterias.buscarPorIdentificadorEProjeto(
                 identificadorMateria, identificadorProjeto);
         if (materiaEncontrada.isEmpty()) {
@@ -64,6 +70,7 @@ public class ProjectSubjectService {
     }
 
     private SubjectResponse criarRespostaDaMateria(ProjectSubject materia) {
+        // Prepara os dados da matéria para a resposta da API.
         return new SubjectResponse(materia.getIdentificador(), materia.getIdentificadorProjeto(),
                 materia.getNome(), materia.getDescricao());
     }

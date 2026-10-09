@@ -18,6 +18,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
+// Cuida das operações de projeto e monta as respostas com seus dados.
 public class ProjectService {
 
     private final ProjectRepository repositorioDeProjetos;
@@ -27,6 +28,7 @@ public class ProjectService {
     public ProjectService(ProjectRepository repositorioDeProjetos,
                           ProjectSubjectRepository repositorioDeMaterias,
                           ProjectStackRepository repositorioDeStacks) {
+        // Guarda os repositórios usados para buscar projetos, matérias e stacks.
         this.repositorioDeProjetos = repositorioDeProjetos;
         this.repositorioDeMaterias = repositorioDeMaterias;
         this.repositorioDeStacks = repositorioDeStacks;
@@ -34,20 +36,24 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<ProjectResponse> listarProjetos() {
+        // Busca todos os projetos e prepara cada um para a resposta da API.
         return repositorioDeProjetos.findAll().stream().map(this::criarRespostaDoProjeto).toList();
     }
 
     @Transactional(readOnly = true)
     public Optional<ProjectResponse> buscarProjetoPorIdentificador(Long identificadorProjeto) {
+        // Busca pelo ID; se não achar, devolve um resultado vazio.
         return repositorioDeProjetos.findById(identificadorProjeto).map(this::criarRespostaDoProjeto);
     }
 
     public ProjectResponse adicionarProjeto(ProjectRequest dadosDoProjeto) {
+        // Cria o projeto, salva no banco e prepara a resposta.
         Project novoProjeto = new Project(dadosDoProjeto.nome(), dadosDoProjeto.objetivo(), dadosDoProjeto.status());
         return criarRespostaDoProjeto(repositorioDeProjetos.save(novoProjeto));
     }
 
     public Optional<ProjectResponse> atualizarProjeto(Long identificadorProjeto, ProjectRequest dadosDoProjeto) {
+        // Busca o projeto, atualiza os dados e devolve vazio se não achar.
         return repositorioDeProjetos.findById(identificadorProjeto).map(projetoEncontrado -> {
             projetoEncontrado.atualizarDados(dadosDoProjeto.nome(), dadosDoProjeto.objetivo(), dadosDoProjeto.status());
             return criarRespostaDoProjeto(repositorioDeProjetos.save(projetoEncontrado));
@@ -55,6 +61,7 @@ public class ProjectService {
     }
 
     public Optional<ProjectResponse> atualizarStatusProjeto(Long identificadorProjeto, ProjectStatus novoStatus) {
+        // Busca o projeto e muda só o status.
         return repositorioDeProjetos.findById(identificadorProjeto).map(projetoEncontrado -> {
             projetoEncontrado.atualizarStatus(novoStatus);
             return criarRespostaDoProjeto(repositorioDeProjetos.save(projetoEncontrado));
@@ -62,6 +69,7 @@ public class ProjectService {
     }
 
     public boolean removerProjeto(Long identificadorProjeto) {
+        // Confere se o projeto existe antes de excluir e informa se conseguiu.
         if (!repositorioDeProjetos.existsById(identificadorProjeto)) {
             return false;
         }
@@ -70,6 +78,8 @@ public class ProjectService {
     }
 
     private ProjectResponse criarRespostaDoProjeto(Project projeto) {
+        // Monta a resposta sem devolver direto os dados internos do banco.
+        // Junta as matérias e stacks para incluir tudo na resposta do projeto.
         List<SubjectResponse> materiasDoProjeto = repositorioDeMaterias.buscarTodasPorProjetoId(projeto.getIdentificador())
                 .stream()
                 .map(materia -> new SubjectResponse(materia.getIdentificador(), materia.getIdentificadorProjeto(),

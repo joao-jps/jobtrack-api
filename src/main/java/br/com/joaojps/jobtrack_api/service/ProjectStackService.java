@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
+// Confere o projeto, cuida das stacks e prepara as respostas da API.
 public class ProjectStackService {
 
     private final ProjectRepository repositorioDeProjetos;
@@ -21,12 +22,14 @@ public class ProjectStackService {
 
     public ProjectStackService(ProjectRepository repositorioDeProjetos,
                                ProjectStackRepository repositorioDeStacks) {
+        // Guarda os repositórios usados para buscar projetos e salvar stacks.
         this.repositorioDeProjetos = repositorioDeProjetos;
         this.repositorioDeStacks = repositorioDeStacks;
     }
 
     @Transactional(readOnly = true)
     public Optional<List<StackResponse>> listarStacksDoProjeto(Long identificadorProjeto) {
+        // Confere se o projeto existe antes de listar as stacks.
         if (!repositorioDeProjetos.existsById(identificadorProjeto)) {
             return Optional.empty();
         }
@@ -35,6 +38,7 @@ public class ProjectStackService {
     }
 
     public Optional<StackResponse> adicionarStackAoProjeto(Long identificadorProjeto, StackRequest dadosDaStack) {
+        // Só salva a stack se o projeto existir.
         if (!repositorioDeProjetos.existsById(identificadorProjeto)) {
             return Optional.empty();
         }
@@ -46,6 +50,7 @@ public class ProjectStackService {
     public Optional<StackResponse> atualizarStackDoProjeto(Long identificadorProjeto,
                                                            Long identificadorStack,
                                                            StackRequest dadosDaStack) {
+        // Confere se a stack é desse projeto antes de atualizar.
         return repositorioDeStacks.buscarPorIdentificadorEProjeto(identificadorStack, identificadorProjeto)
                 .map(stackEncontrada -> {
             stackEncontrada.atualizarDados(dadosDaStack.nome(), dadosDaStack.versao());
@@ -54,6 +59,7 @@ public class ProjectStackService {
     }
 
     public boolean removerStackDoProjeto(Long identificadorProjeto, Long identificadorStack) {
+        // Só remove a stack se ela for desse projeto.
         Optional<ProjectStack> stackEncontrada = repositorioDeStacks.buscarPorIdentificadorEProjeto(
                 identificadorStack, identificadorProjeto);
         if (stackEncontrada.isEmpty()) {
@@ -64,6 +70,7 @@ public class ProjectStackService {
     }
 
     private StackResponse criarRespostaDaStack(ProjectStack stack) {
+        // Prepara os dados da stack para a resposta da API.
         return new StackResponse(stack.getIdentificador(), stack.getIdentificadorProjeto(),
                 stack.getNome(), stack.getVersao());
     }
